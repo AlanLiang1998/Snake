@@ -4,6 +4,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/*需完善的地方：
+1、边界处理
+2、Egg出现在Snake身上的bug*/
 public class Yard extends Frame {
     public static final int ROWS = 30;
     public static final int COLS = 30;
@@ -12,7 +15,7 @@ public class Yard extends Frame {
     public static final int HEIGHT = COLS * BLOCK_SIZE;
     Image offScreenImage = null;
     Snake s = new Snake(this);
-    Egg e = new Egg();
+    Egg e = new Egg(this);
     PaintThread pt = new PaintThread();
     boolean gameOver = false;
     private int score = 0;
@@ -44,8 +47,8 @@ public class Yard extends Frame {
 
     public void paint(Graphics g) {
         Color c = g.getColor();
-
         g.setFont(new Font("华文彩云", Font.BOLD, 30));
+        g.setColor(Color.RED);
         g.drawString("score: " + getScore(), 10, 60);
         if (gameOver == true) {
             g.setFont(new Font("华文彩云", Font.BOLD, 50));

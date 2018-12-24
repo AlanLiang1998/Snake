@@ -105,7 +105,7 @@ public class Snake {
     }
 
     public boolean checkDeadth() {
-        if (head.row < 2 || head.col < 0 || head.row > Yard.ROWS || head.col > Yard.COLS) {
+        if (head.row < 2 || head.col < 0 || head.row >= Yard.ROWS || head.col >= Yard.COLS) {
             y.stop();
             return true;
         }
@@ -116,6 +116,15 @@ public class Snake {
             }
         }
         return false;
+    }
+
+    public boolean checkPosition(int row, int col) {
+        for (Node node = head; node != null; node = node.next) {
+            if (row == node.row && col == node.col) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void keyPressed(KeyEvent e) {

@@ -6,6 +6,7 @@ public class Egg {
     public static final int HEIGHT = Yard.BLOCK_SIZE;
     int row;
     int col;
+    Yard y = null;
     static Random rand = new Random();
 
     public Egg(int row, int col) {
@@ -13,8 +14,9 @@ public class Egg {
         this.col = col;
     }
 
-    public Egg() {
+    public Egg(Yard y) {
         this(rand.nextInt(Yard.ROWS - 3) + 3, rand.nextInt(Yard.COLS - 3) + 3);
+        this.y = y;
     }
 
     public void draw(Graphics g) {
@@ -37,8 +39,14 @@ public class Egg {
     }
 
     public void refresh() {
-        setRow(rand.nextInt(Yard.ROWS - 3) + 3);
-        setCol(rand.nextInt(Yard.COLS - 3) + 3);
+        int row = rand.nextInt(Yard.ROWS - 3) + 3;
+        int col = rand.nextInt(Yard.COLS - 3) + 3;
+        while (!y.s.checkPosition(row, col)) {
+            row = rand.nextInt(Yard.ROWS - 3) + 3;
+            col = rand.nextInt(Yard.COLS - 3) + 3;
+        }
+        setRow(row);
+        setCol(col);
     }
 
 
