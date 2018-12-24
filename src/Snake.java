@@ -1,6 +1,30 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Snake {
+    private class Node {
+        public static final int WIDTH = Yard.BLOCK_SIZE;
+        public static final int HEIGHT = Yard.BLOCK_SIZE;
+        int row;
+        int col;
+        Direction dir = Direction.LEFT;
+        Node next = null;
+        Node prev = null;
+
+        public Node(int row, int col, Direction dir) {
+            this.row = row;
+            this.col = col;
+            this.dir = dir;
+        }
+
+        public void draw(Graphics g) {
+            Color c = g.getColor();
+            g.setColor(Color.BLACK);
+            g.fillRect(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
+            g.setColor(c);
+        }
+    }
+
     Node head = null;
     Node tail = null;
     int size = 0;
@@ -29,6 +53,7 @@ public class Snake {
                 break;
         }
         tail.next = node;
+        node.prev = tail;
         tail = node;
         size++;
     }
@@ -50,6 +75,7 @@ public class Snake {
                 break;
         }
         node.next = head;
+        head.prev = node;
         head = node;
         size++;
     }
@@ -58,27 +84,47 @@ public class Snake {
         for (Node node = head; node != null; node = node.next) {
             node.draw(g);
         }
+        move();
     }
 
-    private class Node {
-        public static final int WIDTH = Yard.BLOCK_SIZE;
-        public static final int HEIGHT = Yard.BLOCK_SIZE;
-        int row;
-        int col;
-        Direction dir = Direction.LEFT;
-        Node next = null;
+    private void deleteTail() {
+        if (size == 0)
+            return;
+        tail = tail.prev;
+        tail.next = null;
+    }
 
-        public Node(int row, int col, Direction dir) {
-            this.row = row;
-            this.col = col;
-            this.dir = dir;
+    private void move() {
+        addToHead();
+        deleteTail();
+    }
+
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        switch (key) {
+            case KeyEvent.VK_A:
+                head.dir = Direction.LEFT;
+                break;
+            case KeyEvent.VK_W:
+                head.dir = Direction.UP;
+                break;
+            case KeyEvent.VK_D:
+                head.dir = Direction.RIGHT;
+                break;
+            case KeyEvent.VK_S:
+                head.dir = Direction.DOWN;
+                break;
         }
+    }
 
-        public void draw(Graphics g) {
-            Color c = g.getColor();
-            g.setColor(Color.BLACK);
-            g.fillRect(row * WIDTH, col * HEIGHT, WIDTH, HEIGHT);
-            g.setColor(c);
+    public Rectangle getRect() {
+        return new Rectangle(Node.WIDTH * head.col, Node.HEIGHT * head.row, Node.WIDTH, Node.HEIGHT);
+    }
+
+    public void eat(Egg e) {
+        if (this.getRect().intersects(e.getRect())) {
+            e.refresh();
+            addToHead();
         }
     }
 }
