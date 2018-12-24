@@ -3,11 +3,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Yard extends Frame {
-    private static final int ROWS = 40;
-    private static final int COLS = 40;
-    private static final int BLOCK_SIZE = 25;
-    private static final int WIDTH = ROWS * BLOCK_SIZE;
-    private static final int HEIGHT = COLS * BLOCK_SIZE;
+    public static final int ROWS = 40;
+    public static final int COLS = 40;
+    public static final int BLOCK_SIZE = 25;
+    public static final int WIDTH = ROWS * BLOCK_SIZE;
+    public static final int HEIGHT = COLS * BLOCK_SIZE;
+    Snake s = new Snake();
 
     public void launch() {
         setTitle("Retro Snaker");
@@ -33,6 +34,7 @@ public class Yard extends Frame {
         for (int i = 1; i < COLS; i++) {
             g.drawLine(BLOCK_SIZE * i, 0, BLOCK_SIZE * i, HEIGHT);
         }
+        s.draw(g);
     }
 
     public static void main(String[] args) {
