@@ -11,8 +11,19 @@ public class Yard extends Frame {
     public static final int WIDTH = ROWS * BLOCK_SIZE;
     public static final int HEIGHT = COLS * BLOCK_SIZE;
     Image offScreenImage = null;
-    Snake s = new Snake();
+    Snake s = new Snake(this);
     Egg e = new Egg();
+    PaintThread pt = new PaintThread();
+    boolean gameOver = false;
+    private int score = 0;
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
 
     public void launch() {
         setTitle("Retro Snaker");
@@ -26,13 +37,21 @@ public class Yard extends Frame {
                 System.exit(0);
             }
         });
-        new Thread(new PaintThread()).start();
+        new Thread(pt).start();
         addKeyListener(new KeyMonitor());
         setVisible(true);
     }
 
     public void paint(Graphics g) {
         Color c = g.getColor();
+
+        g.setFont(new Font("华文彩云", Font.BOLD, 30));
+        g.drawString("score: " + getScore(), 10, 60);
+        if (gameOver == true) {
+            g.setFont(new Font("华文彩云", Font.BOLD, 50));
+            g.drawString("GAME OVER", 300, 450);
+            pt.over();
+        }
         g.setColor(Color.DARK_GRAY);
         for (int i = 1; i < ROWS; i++) {
             g.drawLine(0, BLOCK_SIZE * i, WIDTH, BLOCK_SIZE * i);
@@ -40,6 +59,7 @@ public class Yard extends Frame {
         for (int i = 1; i < COLS; i++) {
             g.drawLine(BLOCK_SIZE * i, 0, BLOCK_SIZE * i, HEIGHT);
         }
+        g.setColor(c);
         s.draw(g);
         e.draw(g);
         s.eat(e);
@@ -57,11 +77,23 @@ public class Yard extends Frame {
         g.drawImage(offScreenImage, 0, 0, null);
     }
 
+    public void stop() {
+        gameOver = true;
+    }
+
+    private class KeyMonitor extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            s.keyPressed(e);
+        }
+    }
+
     private class PaintThread implements Runnable {
+        boolean running = true;
 
         @Override
         public void run() {
-            while (true) {
+            while (running) {
                 repaint();
                 try {
                     Thread.sleep(120);
@@ -70,12 +102,9 @@ public class Yard extends Frame {
                 }
             }
         }
-    }
 
-    private class KeyMonitor extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            s.keyPressed(e);
+        public void over() {
+            running = false;
         }
     }
 

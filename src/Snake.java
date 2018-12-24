@@ -29,11 +29,13 @@ public class Snake {
     Node tail = null;
     int size = 0;
     Node init = new Node(20, 20, Direction.LEFT);
+    Yard y = null;
 
-    public Snake() {
+    public Snake(Yard y) {
         head = init;
         tail = init;
         size = 1;
+        this.y = y;
     }
 
     public void addToTail() {
@@ -81,10 +83,12 @@ public class Snake {
     }
 
     public void draw(Graphics g) {
+        if (size <= 0)
+            return;
+        move();
         for (Node node = head; node != null; node = node.next) {
             node.draw(g);
         }
-        move();
     }
 
     private void deleteTail() {
@@ -97,22 +101,41 @@ public class Snake {
     private void move() {
         addToHead();
         deleteTail();
+        checkDeadth();
+    }
+
+    public boolean checkDeadth() {
+        if (head.row < 2 || head.col < 0 || head.row > Yard.ROWS || head.col > Yard.COLS) {
+            y.stop();
+            return true;
+        }
+        for (Node node = head.next; node != null; node = node.next) {
+            if (head.row == node.row && head.col == node.col) {
+                y.stop();
+                return true;
+            }
+        }
+        return false;
     }
 
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key) {
             case KeyEvent.VK_A:
-                head.dir = Direction.LEFT;
+                if (head.dir != Direction.RIGHT)
+                    head.dir = Direction.LEFT;
                 break;
             case KeyEvent.VK_W:
-                head.dir = Direction.UP;
+                if (head.dir != Direction.DOWN)
+                    head.dir = Direction.UP;
                 break;
             case KeyEvent.VK_D:
-                head.dir = Direction.RIGHT;
+                if (head.dir != Direction.LEFT)
+                    head.dir = Direction.RIGHT;
                 break;
             case KeyEvent.VK_S:
-                head.dir = Direction.DOWN;
+                if (head.dir != Direction.UP)
+                    head.dir = Direction.DOWN;
                 break;
         }
     }
@@ -125,6 +148,7 @@ public class Snake {
         if (this.getRect().intersects(e.getRect())) {
             e.refresh();
             addToHead();
+            y.setScore(y.getScore() + 5);
         }
     }
 }

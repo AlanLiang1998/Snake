@@ -19,7 +19,7 @@ public class Egg {
 
     public void draw(Graphics g) {
         Color c = g.getColor();
-        g.setColor(Color.RED);
+        g.setColor(Color.YELLOW);
         g.fillOval(WIDTH * col, HEIGHT * row, WIDTH, HEIGHT);
         g.setColor(c);
     }
