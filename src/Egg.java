@@ -2,21 +2,21 @@ import java.awt.*;
 import java.util.Random;
 
 public class Egg {
-    public static final int WIDTH = Yard.BLOCK_SIZE;
-    public static final int HEIGHT = Yard.BLOCK_SIZE;
-    int row;
-    int col;
-    Yard y = null;
-    static Random rand = new Random();
+    private static final int WIDTH = UI.BLOCK_SIZE;
+    private static final int HEIGHT = UI.BLOCK_SIZE;
+    private static Random rand = new Random();
+    private int row;
+    private int col;
+    private UI ui = null;
 
     public Egg(int row, int col) {
         this.row = row;
         this.col = col;
     }
 
-    public Egg(Yard y) {
-        this(rand.nextInt(Yard.ROWS - 3) + 3, rand.nextInt(Yard.COLS - 3) + 3);
-        this.y = y;
+    public Egg(UI ui) {
+        this(rand.nextInt(UI.ROWS - 3) + 3, rand.nextInt(UI.COLS - 3) + 3);
+        this.ui = ui;
     }
 
     public void draw(Graphics g) {
@@ -39,15 +39,14 @@ public class Egg {
     }
 
     public void refresh() {
-        int row = rand.nextInt(Yard.ROWS - 3) + 3;
-        int col = rand.nextInt(Yard.COLS - 3) + 3;
-        while (!y.s.checkPosition(row, col)) {
-            row = rand.nextInt(Yard.ROWS - 3) + 3;
-            col = rand.nextInt(Yard.COLS - 3) + 3;
+        int row = rand.nextInt(UI.ROWS - 3) + 3;
+        int col = rand.nextInt(UI.COLS - 3) + 3;
+        while (!ui.s.checkPosition(row, col)) {
+            row = rand.nextInt(UI.ROWS - 3) + 3;
+            col = rand.nextInt(UI.COLS - 3) + 3;
         }
         setRow(row);
         setCol(col);
     }
-
 
 }

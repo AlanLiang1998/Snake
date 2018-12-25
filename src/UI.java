@@ -4,21 +4,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/*需完善的地方：
-1、边界处理
-2、Egg出现在Snake身上的bug*/
-public class Yard extends Frame {
+public class UI extends Frame {
     public static final int ROWS = 30;
     public static final int COLS = 30;
     public static final int BLOCK_SIZE = 30;
-    public static final int WIDTH = ROWS * BLOCK_SIZE;
-    public static final int HEIGHT = COLS * BLOCK_SIZE;
-    Image offScreenImage = null;
-    Snake s = new Snake(this);
-    Egg e = new Egg(this);
-    PaintThread pt = new PaintThread();
-    boolean gameOver = false;
-    private int score = 0;
+    private static final int WIDTH = ROWS * BLOCK_SIZE;
+    private static final int HEIGHT = COLS * BLOCK_SIZE;
+    Snake s;
+    private Image offScreenImage;
+    private Egg e;
+    private PaintThread pt;
+    private boolean gameOver;
+    private int score;
+    private long startTime;
 
     public int getScore() {
         return score;
@@ -28,7 +26,21 @@ public class Yard extends Frame {
         this.score = score;
     }
 
-    public void launch() {
+    public static void main(String[] args) {
+        new UI().launch();
+    }
+
+    private void startGame() {
+        offScreenImage = null;
+        s = new Snake(this);
+        e = new Egg(this);
+        pt = new PaintThread();
+        gameOver = false;
+        score = 0;
+        startTime = System.currentTimeMillis();
+    }
+
+    private void launch() {
         setTitle("Retro Snaker");
         setLocation(100, 100);
         setSize(WIDTH, HEIGHT);
@@ -40,21 +52,35 @@ public class Yard extends Frame {
                 System.exit(0);
             }
         });
-        new Thread(pt).start();
         addKeyListener(new KeyMonitor());
+        startGame();
+        new Thread(pt).start();
         setVisible(true);
     }
 
-    public void paint(Graphics g) {
+    private void drawRecordFont(Graphics g) {
         Color c = g.getColor();
         g.setFont(new Font("华文彩云", Font.BOLD, 30));
         g.setColor(Color.RED);
-        g.drawString("score: " + getScore(), 10, 60);
-        if (gameOver == true) {
-            g.setFont(new Font("华文彩云", Font.BOLD, 50));
-            g.drawString("GAME OVER", 300, 450);
-            pt.over();
-        }
+        g.drawString("score: " + getScore(), 50, 60);
+        g.drawString("length: " + s.getLength(), 250, 60);
+        long currentTime = System.currentTimeMillis();
+        long usedTime = (currentTime - startTime) / 1000;
+        g.drawString("time: " + usedTime + "s", 450, 60);
+        g.setColor(c);
+    }
+
+    private void drawGameOverFont(Graphics g) {
+        Color c = g.getColor();
+        g.setColor(Color.RED);
+        g.setFont(new Font("华文彩云", Font.BOLD, 50));
+        g.drawString("GAME OVER", 300, 450);
+        pt.over();
+        g.setColor(c);
+    }
+
+    private void drawGrid(Graphics g) {
+        Color c = g.getColor();
         g.setColor(Color.DARK_GRAY);
         for (int i = 1; i < ROWS; i++) {
             g.drawLine(0, BLOCK_SIZE * i, WIDTH, BLOCK_SIZE * i);
@@ -63,9 +89,6 @@ public class Yard extends Frame {
             g.drawLine(BLOCK_SIZE * i, 0, BLOCK_SIZE * i, HEIGHT);
         }
         g.setColor(c);
-        s.draw(g);
-        e.draw(g);
-        s.eat(e);
     }
 
     public void update(Graphics g) {
@@ -111,7 +134,13 @@ public class Yard extends Frame {
         }
     }
 
-    public static void main(String[] args) {
-        new Yard().launch();
+    public void paint(Graphics g) {
+        drawRecordFont(g);
+        drawGrid(g);
+        if (gameOver)
+            drawGameOverFont(g);
+        s.draw(g);
+        e.draw(g);
+        s.eat(e);
     }
 }

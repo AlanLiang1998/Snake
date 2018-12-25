@@ -1,44 +1,43 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Random;
 
 public class Snake {
-    private class Node {
-        public static final int WIDTH = Yard.BLOCK_SIZE;
-        public static final int HEIGHT = Yard.BLOCK_SIZE;
-        int row;
-        int col;
-        Direction dir = Direction.LEFT;
-        Node next = null;
-        Node prev = null;
+    private static Random rand;
+    private Node head;
+    private Node tail;
+    private int length;
+    private UI ui;
 
-        public Node(int row, int col, Direction dir) {
-            this.row = row;
-            this.col = col;
-            this.dir = dir;
-        }
-
-        public void draw(Graphics g) {
-            Color c = g.getColor();
-            g.setColor(Color.BLACK);
-            g.fillRect(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
-            g.setColor(c);
-        }
+    public Snake(UI ui) {
+        init();
+        Direction dir = getRandDir();
+        Node initNode = new Node(20, 20, dir);
+        head = initNode;
+        tail = initNode;
+        length = 1;
+        this.ui = ui;
     }
 
-    Node head = null;
-    Node tail = null;
-    int size = 0;
-    Node init = new Node(20, 20, Direction.LEFT);
-    Yard y = null;
-
-    public Snake(Yard y) {
-        head = init;
-        tail = init;
-        size = 1;
-        this.y = y;
+    private void init() {
+        head = null;
+        tail = null;
+        length = 0;
+        ui = null;
+        rand = new Random();
     }
 
-    public void addToTail() {
+    private Direction getRandDir() {
+        Direction[] dirs = Direction.values();
+        int d = rand.nextInt(dirs.length);
+        return dirs[d];
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    private void addToTail() {
         Node node = null;
         switch (tail.dir) {
             case LEFT:
@@ -57,10 +56,10 @@ public class Snake {
         tail.next = node;
         node.prev = tail;
         tail = node;
-        size++;
+        length++;
     }
 
-    public void addToHead() {
+    private void addToHead() {
         Node node = null;
         switch (head.dir) {
             case LEFT:
@@ -79,11 +78,11 @@ public class Snake {
         node.next = head;
         head.prev = node;
         head = node;
-        size++;
+        length++;
     }
 
     public void draw(Graphics g) {
-        if (size <= 0)
+        if (length <= 0)
             return;
         move();
         for (Node node = head; node != null; node = node.next) {
@@ -92,10 +91,22 @@ public class Snake {
     }
 
     private void deleteTail() {
-        if (size == 0)
+        if (length <= 0)
             return;
         tail = tail.prev;
         tail.next = null;
+        length--;
+    }
+
+    private void checkDeadth() {
+        if (head.row < 2 || head.col < 0 || head.row >= UI.ROWS || head.col >= UI.COLS) {
+            ui.stop();
+        }
+        for (Node node = head.next; node != null; node = node.next) {
+            if (head.row == node.row && head.col == node.col) {
+                ui.stop();
+            }
+        }
     }
 
     private void move() {
@@ -104,19 +115,10 @@ public class Snake {
         checkDeadth();
     }
 
-    public boolean checkDeadth() {
-        if (head.row < 2 || head.col < 0 || head.row >= Yard.ROWS || head.col >= Yard.COLS) {
-            y.stop();
-            return true;
-        }
-        for (Node node = head.next; node != null; node = node.next) {
-            if (head.row == node.row && head.col == node.col) {
-                y.stop();
-                return true;
-            }
-        }
-        return false;
+    private Rectangle getRect() {
+        return new Rectangle(Node.WIDTH * head.col, Node.HEIGHT * head.row, Node.WIDTH, Node.HEIGHT);
     }
+
 
     public boolean checkPosition(int row, int col) {
         for (Node node = head; node != null; node = node.next) {
@@ -149,15 +151,34 @@ public class Snake {
         }
     }
 
-    public Rectangle getRect() {
-        return new Rectangle(Node.WIDTH * head.col, Node.HEIGHT * head.row, Node.WIDTH, Node.HEIGHT);
-    }
-
     public void eat(Egg e) {
         if (this.getRect().intersects(e.getRect())) {
             e.refresh();
             addToHead();
-            y.setScore(y.getScore() + 5);
+            ui.setScore(ui.getScore() + 5);
+        }
+    }
+
+    private class Node {
+        static final int WIDTH = UI.BLOCK_SIZE;
+        static final int HEIGHT = UI.BLOCK_SIZE;
+        int row;
+        int col;
+        Direction dir;
+        Node next = null;
+        Node prev = null;
+
+        Node(int row, int col, Direction dir) {
+            this.row = row;
+            this.col = col;
+            this.dir = dir;
+        }
+
+        void draw(Graphics g) {
+            Color c = g.getColor();
+            g.setColor(Color.BLACK);
+            g.fillRect(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
+            g.setColor(c);
         }
     }
 }
