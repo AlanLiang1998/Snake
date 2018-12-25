@@ -8,6 +8,7 @@ public class Egg {
     private int row;
     private int col;
     private UI ui = null;
+    Color color = Color.RED;
 
     public Egg(int row, int col) {
         this.row = row;
@@ -21,9 +22,13 @@ public class Egg {
 
     public void draw(Graphics g) {
         Color c = g.getColor();
-        g.setColor(Color.YELLOW);
+        g.setColor(color);
         g.fillOval(WIDTH * col, HEIGHT * row, WIDTH, HEIGHT);
         g.setColor(c);
+        if (color == Color.RED)
+            color = Color.YELLOW;
+        else
+            color = Color.RED;
     }
 
     public Rectangle getRect() {

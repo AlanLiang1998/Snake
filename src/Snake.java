@@ -9,6 +9,31 @@ public class Snake {
     private int length;
     private UI ui;
 
+    private class Node {
+        static final int WIDTH = UI.BLOCK_SIZE;
+        static final int HEIGHT = UI.BLOCK_SIZE;
+        int row;
+        int col;
+        Direction dir;
+        Node next = null;
+        Node prev = null;
+
+        Node(int row, int col, Direction dir) {
+            this.row = row;
+            this.col = col;
+            this.dir = dir;
+        }
+
+        void draw(Graphics g) {
+            Color c = g.getColor();
+            g.setColor(Color.BLACK);
+            g.drawOval(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
+            g.setColor(Color.YELLOW);
+            g.fillOval(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
+            g.setColor(c);
+        }
+    }
+
     public Snake(UI ui) {
         init();
         Direction dir = getRandDir();
@@ -156,29 +181,6 @@ public class Snake {
             e.refresh();
             addToHead();
             ui.setScore(ui.getScore() + 5);
-        }
-    }
-
-    private class Node {
-        static final int WIDTH = UI.BLOCK_SIZE;
-        static final int HEIGHT = UI.BLOCK_SIZE;
-        int row;
-        int col;
-        Direction dir;
-        Node next = null;
-        Node prev = null;
-
-        Node(int row, int col, Direction dir) {
-            this.row = row;
-            this.col = col;
-            this.dir = dir;
-        }
-
-        void draw(Graphics g) {
-            Color c = g.getColor();
-            g.setColor(Color.BLACK);
-            g.fillRect(col * WIDTH, row * HEIGHT, WIDTH, HEIGHT);
-            g.setColor(c);
         }
     }
 }
